@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "fastapi-mongoengine"
+version = "0.1.0"
+description = ""
+authors = ["geektan <geektan@aliyun.com>"]
+readme = "README.md"
+packages = [{include = "fastapi_mongoengine"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+mongoengine = "^0.25.0"
+fastapi = "^0.89.1"
+
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+secondary = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
