@@ -1,15 +1,10 @@
-import logging
-
-import mongoengine
 from fastapi import HTTPException
 from mongoengine import QuerySet, DoesNotExist
 
-from fastapi_mongoengine.pagination import ListFieldPagination, Pagination
-
-logger = logging.getLogger("fastapi_mongoengine")
+from fastapi_mongoengine.extend.pagination import Pagination, ListFieldPagination
 
 
-class BaseQuerySet(QuerySet):
+class ExtendQuerySet(QuerySet):
     """Extends :class:`~mongoengine.queryset.QuerySet` class with handly methods."""
 
     def _abort_404(self, _message_404):
@@ -64,13 +59,3 @@ class BaseQuerySet(QuerySet):
         return ListFieldPagination(
             self, doc_id, field_name, page, per_page, total=total
         )
-
-
-class Document(mongoengine.Document):
-    meta = {"queryset_class": BaseQuerySet}
-
-
-class DynamicDocument(mongoengine.DynamicDocument):
-    """Abstract DynamicDocument with QuerySet and WTForms extra helpers."""
-
-    meta = {"queryset_class": BaseQuerySet}

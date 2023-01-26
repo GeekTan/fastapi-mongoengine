@@ -1,31 +1,46 @@
-import mongoengine
+import collections
+import contextvars
+from contextlib import contextmanager
+from typing import Dict
+
 from fastapi import FastAPI
+from mongoengine import connect, ConnectionFailure
+from pymongo import MongoClient
 
-from fastapi_mongoengine.connection import create_connections
+__all__ = ("FastApiMongoEngine",)
 
-global connections
+connections: contextvars.ContextVar[MongoClient] = contextvars.ContextVar("connections")
 
 
-class MongoEngine:
-    def __init__(self, app: FastAPI = None, config=None):
-        self.app = app
-        self.config = config
-        if app is not None:
+class FastApiMongoEngine:
+    app: FastAPI
+    config: Dict
+
+    def __init__(self, app: FastAPI = None, config: Dict = None):
+        connections.set(collections.defaultdict(dict))
+
+        if app is not None and config is not None:
             self.init_app(app, config)
 
-    def init_app(self, app: FastAPI, config=None):
+    def init_app(self, app: FastAPI, config: Dict):
         if not app or not isinstance(app, FastAPI):
             raise TypeError("Invalid FastAPI application instance")
         self.app = app
-        app.add_event_handler("startup", self._init_app(config))
+        self.config = config
+        self.app.add_event_handler("startup", self._connect_mongo)
 
-    def _init_app(self, config):
-        global connections
-        connections = create_connections(config)
+    def _connect_mongo(self):
+        for alias in self.config.keys():
+            conn = connections.get()
+            conn[alias] = connect(alias=alias, **self.config.get(alias))
+            connections.set(conn)
 
-    def __getattr__(self, attr_name):
-        return getattr(mongoengine, attr_name)
 
+@contextmanager
+def get_mongo_session(alias: str):
+    conn = connections.get()[alias]
+    if isinstance(conn, dict):
+        raise ConnectionFailure(f"Cannot connect to database {alias} :\n")
 
-async def get_mongoengine():
-    return connections
+    with conn.start_session(causal_consistency=True) as session:
+        yield session

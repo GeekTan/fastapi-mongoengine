@@ -9,7 +9,6 @@ packages = [{include = "fastapi_mongoengine"}]
 [tool.poetry.dependencies]
 python = "^3.8"
 mongoengine = "^0.25.0"
-fastapi = "^0.89.1"
 
 
 [[tool.poetry.source]]
@@ -17,6 +16,16 @@ name = "tsinghua"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
 secondary = false
+
+
+[tool.poetry.group.test.dependencies]
+pytest-asyncio = "^0.20.3"
+httpx = "^0.23.3"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+
+
+[tool.poetry.group.dev.dependencies]
+fastapi = "^0.89.1"
 
 [build-system]
 requires = ["poetry-core"]
