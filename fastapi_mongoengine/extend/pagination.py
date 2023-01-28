@@ -125,7 +125,7 @@ class ListFieldPagination(Pagination):
     def __init__(self, queryset, doc_id, field_name, page, per_page, total=None):
         """Allows an array within a document to be paginated.
 
-        Queryset must contain the document which has the array we're
+        Queryset must contain the document which has the array we're/home/geektan/GitProjects/flask-mongoengine
         paginating, and doc_id should be it's _id.
         Field name is the name of the array we're paginating.
         Page and per_page work just like in Pagination.

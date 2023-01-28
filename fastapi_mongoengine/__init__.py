@@ -7,7 +7,12 @@ from fastapi import FastAPI
 from mongoengine import connect, ConnectionFailure
 from pymongo import MongoClient
 
-__all__ = ("FastApiMongoEngine",)
+__all__ = (
+    "FastApiMongoEngine",
+    "get_mongo_session",
+)
+
+from fastapi_mongoengine.extend import document
 
 connections: contextvars.ContextVar[MongoClient] = contextvars.ContextVar("connections")
 
@@ -18,6 +23,8 @@ class FastApiMongoEngine:
 
     def __init__(self, app: FastAPI = None, config: Dict = None):
         connections.set(collections.defaultdict(dict))
+        self.Document = document.ExtendDocument
+        self.DynamicDocument = document.ExtendDynamicDocument
 
         if app is not None and config is not None:
             self.init_app(app, config)
